@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+
+  jenkins:
+    image: jenkins:${TAG:-2.46.1-alpine}
+    ports:
+      - "50000:50000"
+    networks:
+      - proxy
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.serviceDomain=jenkins.dockerflow.com
+        - com.df.port=8080
+      resources:
+        reservations:
+          memory: 300M
+
+  jenkins-agent-worker:
+    image: vfarcic/jenkins-swarm-agent
+    environment:
+      - COMMAND_OPTIONS=-master http://jenkins:8080 -username ${JENKINS_USER} -password ${JENKINS_PASS} -labels 'build' -executors 1
+    networks:
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /workspace:/workspace
+    deploy:
+      resources:
+        reservations:
+          memory: 100M
+
+  jenkins-agent-manager:
+    image: vfarcic/jenkins-swarm-agent
+    environment:
+      - COMMAND_OPTIONS=-master http://jenkins:8080 -username ${JENKINS_USER} -password ${JENKINS_PASS} -labels 'prod' -executors 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /workspace:/workspace
+    networks:
+      - default
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 100M
+
+  portainer:
+    image: portainer/portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.port=9000
+        - com.df.serviceDomain=portainer.dockerflow.com
+      resources:
+        reservations:
+          memory: 100M
+    command: -H unix:///var/run/docker.sock
+
+networks:
+  proxy:
+    external: true
+  default:
+    external: false
