@@ -30,7 +30,6 @@ services:
       - default
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /workspace:/workspace
     deploy:
       resources:
         reservations:
@@ -42,7 +41,6 @@ services:
       - COMMAND_OPTIONS=-master http://jenkins:8080 -username ${JENKINS_USER} -password ${JENKINS_PASS} -labels 'prod' -executors 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /workspace:/workspace
     networks:
       - default
     deploy:
