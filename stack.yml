@@ -10,7 +10,7 @@ services:
       - proxy
       - default
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins:/var/jenkins_home
     deploy:
       labels:
         - com.df.notify=true
@@ -77,3 +77,7 @@ networks:
     external: true
   default:
     external: false
+
+volumes:
+  jenkins:
+    driver: cloudstor:aws
