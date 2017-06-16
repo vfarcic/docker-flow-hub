@@ -17,6 +17,26 @@ services:
         - com.df.servicePath=/
         - com.df.serviceDomain=jenkins.dockerflow.com
         - com.df.port=8080
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 1000M
+        limits:
+          memory: 1500M
+    secrets:
+      - jenkins-user
+      - jenkins-pass
+
+  jenkins-agent:
+    image: vfarcic/jenkins-swarm-agent
+    environment:
+      - USER_NAME_SECRET=/run/secrets/${JENKINS_USER_SECRET:-jenkins-user}
+      - PASSWORD_SECRET=/run/secrets/${JENKINS_PASS_SECRET:-jenkins-pass}
+      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com -labels "docker" -executors 5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     secrets:
       - jenkins-user
       - jenkins-pass
