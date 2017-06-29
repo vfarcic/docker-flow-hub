@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
 
-  jenkins:
+  jenkins-master:
     image: vfarcic/jenkins
     ports:
       - 50000:50000
@@ -25,6 +25,8 @@ services:
           memory: 1000M
         limits:
           memory: 1500M
+    extra_hosts:
+      - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
     secrets:
       - jenkins-user
       - jenkins-pass
@@ -34,12 +36,20 @@ services:
     environment:
       - USER_NAME_SECRET=/run/secrets/${JENKINS_USER_SECRET:-jenkins-user}
       - PASSWORD_SECRET=/run/secrets/${JENKINS_PASS_SECRET:-jenkins-pass}
-      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com -labels "docker" -executors 5
+      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com -labels "prod" -executors 2
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
       - jenkins-user
       - jenkins-pass
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 150M
+        limits:
+          memory: 300M
 
 networks:
   proxy:
@@ -48,6 +58,9 @@ networks:
 volumes:
   jenkins:
     driver: cloudstor:aws
+    driver_opts:
+      size: "25"
+    external: false
 
 secrets:
   jenkins-user:
