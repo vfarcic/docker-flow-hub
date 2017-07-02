@@ -16,6 +16,11 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 500M
+        limits:
+          memory: 1000M
       mode: global
 
 networks:
