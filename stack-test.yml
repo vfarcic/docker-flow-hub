@@ -5,6 +5,7 @@ services:
   jenkins-master:
     image: vfarcic/jenkins
     ports:
+      - 80:8080
       - 50000:50000
     networks:
       - proxy
