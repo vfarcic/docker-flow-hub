@@ -14,24 +14,23 @@ services:
       - jenkins-user
       - jenkins-pass
     deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
       placement:
         constraints: [node.role == manager]
       resources:
         reservations:
-          memory: 150M
+          memory: 1000M
         limits:
-          memory: 300M
+          memory: 1500M
 
 networks:
   proxy:
     external: true
-
-volumes:
-  jenkins:
-    driver: cloudstor:aws
-    driver_opts:
-      size: "25"
-    external: false
 
 secrets:
   jenkins-user:

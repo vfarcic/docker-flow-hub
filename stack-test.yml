@@ -22,9 +22,9 @@ services:
         - com.df.alertFor=30s
       resources:
         reservations:
-          memory: 1500M
+          memory: 1000M
         limits:
-          memory: 2000M
+          memory: 1500M
     extra_hosts:
       - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
     secrets:
@@ -43,6 +43,12 @@ services:
       - jenkins-user
       - jenkins-pass
     deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
       placement:
         constraints: [node.role == manager]
       resources:
@@ -61,3 +67,10 @@ secrets:
     external: true
   jenkins-pass:
     external: true
+
+volumes:
+  jenkins:
+    driver: cloudstor:aws
+    driver_opts:
+      size: "25"
+    external: false
