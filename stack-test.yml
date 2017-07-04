@@ -17,9 +17,6 @@ services:
         - com.df.servicePath=/
         - com.df.serviceDomain=jenkins.dockerflow.com
         - com.df.port=8080
-        - com.df.alertName=memlimit
-        - com.df.alertIf=@service_mem_limit:0.8
-        - com.df.alertFor=30s
       resources:
         reservations:
           memory: 1000M
@@ -43,12 +40,6 @@ services:
       - jenkins-user
       - jenkins-pass
     deploy:
-      labels:
-        - com.df.notify=true
-        - com.df.distribute=true
-        - com.df.alertName=memlimit
-        - com.df.alertIf=@service_mem_limit:0.8
-        - com.df.alertFor=30s
       placement:
         constraints: [node.role == manager]
       resources:
@@ -56,7 +47,7 @@ services:
           memory: 1000M
         limits:
           memory: 1500M
-      mode: global
+      replicas: 2
 
 networks:
   proxy:
