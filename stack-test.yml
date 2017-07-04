@@ -2,6 +2,35 @@ version: "3.1"
 
 services:
 
+  jenkins-master:
+    image: vfarcic/jenkins
+    ports:
+      - 50000:50000
+    networks:
+      - proxy
+    volumes:
+      - jenkins:/var/jenkins_home
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.serviceDomain=jenkins.dockerflow.com
+        - com.df.port=8080
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 1500M
+        limits:
+          memory: 2000M
+    extra_hosts:
+      - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
+    secrets:
+      - jenkins-user
+      - jenkins-pass
+
   jenkins-agent:
     image: vfarcic/jenkins-swarm-agent:1.3
     environment:
