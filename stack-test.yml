@@ -83,7 +83,6 @@ services:
           memory: 1000M
         limits:
           memory: 1500M
-      replicas: 2
 
 networks:
   proxy:
