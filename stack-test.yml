@@ -2,48 +2,10 @@ version: "3.1"
 
 services:
 
-  swarm-listener:
-    image: vfarcic/docker-flow-swarm-listener
-    networks:
-      - proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
-      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      resources:
-        reservations:
-          memory: 10M
-        limits:
-          memory: 20M
-
-  proxy:
-    image: vfarcic/docker-flow-proxy
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - proxy
-    environment:
-      - LISTENER_ADDRESS=swarm-listener
-      - MODE=swarm
-      - CONNECTION_MODE=http-keep-alive
-    deploy:
-      resources:
-        reservations:
-          memory: 10M
-        limits:
-          memory: 20M
-
   jenkins-master:
     image: vfarcic/jenkins
     ports:
       - 50000:50000
-    networks:
-      - proxy
     volumes:
       - jenkins:/var/jenkins_home
     deploy:
@@ -69,7 +31,7 @@ services:
     environment:
       - USER_NAME_SECRET=/run/secrets/${JENKINS_USER_SECRET:-jenkins-user}
       - PASSWORD_SECRET=/run/secrets/${JENKINS_PASS_SECRET:-jenkins-pass}
-      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com -labels "test" -executors 1
+      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com:8080 -labels "test" -executors 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
@@ -83,10 +45,6 @@ services:
           memory: 1000M
         limits:
           memory: 1500M
-
-networks:
-  proxy:
-    external: true
 
 secrets:
   jenkins-user:
