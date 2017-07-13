@@ -9,7 +9,7 @@ services:
       - 50000:50000
     volumes:
       - jm:/var/jenkins_home
-      - jsshare:/usr/share/jenkins/ref
+      - jmshare:/usr/share/jenkins/ref
     deploy:
       labels:
         - com.df.notify=true
