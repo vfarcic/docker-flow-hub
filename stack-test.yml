@@ -8,7 +8,8 @@ services:
       - 8090:8080
       - 50000:50000
     volumes:
-      - jenkins:/var/jenkins_home
+      - jm:/var/jenkins_home
+      - jsshare:/usr/share/jenkins/ref
     deploy:
       labels:
         - com.df.notify=true
@@ -54,8 +55,13 @@ secrets:
     external: true
 
 volumes:
-  jenkins:
+  jm:
     driver: cloudstor:aws
     driver_opts:
       size: "25"
+    external: false
+  jmshare:
+    driver: cloudstor:aws
+    driver_opts:
+      size: "10"
     external: false
