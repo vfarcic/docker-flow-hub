@@ -44,9 +44,9 @@ services:
         constraints: [node.role == manager]
       resources:
         reservations:
-          memory: 1500M
+          memory: 1000M
         limits:
-          memory: 2000M
+          memory: 1500M
 
 secrets:
   jenkins-user:
