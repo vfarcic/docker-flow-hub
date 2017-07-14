@@ -12,9 +12,9 @@ It consists of the following projects:
 
 **[Docker Flow Cron](http://cron.dockerflow.com/)**: provides cron-like time-based scheduling while maintaining fault tolerance features available in Docker Swarm.
 
-**Docker Flow Let's Encrypt (by hamburml)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
+**[Docker Flow Let's Encrypt (by hamburml)**](https://github.com/hamburml/docker-flow-letsencrypt): periodically creates certificates and sends them to *Docker Flow Proxy*.
 
-**Docker Flow Let's Encrypt (by nib0r)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
+**[Docker Flow Let's Encrypt (by nib0r)](https://github.com/n1b0r/docker-flow-proxy-letsencrypt)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
 
 ---
 
