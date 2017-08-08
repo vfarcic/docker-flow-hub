@@ -19,9 +19,9 @@ services:
         - com.df.port=8080
       resources:
         reservations:
-          memory: 1500M
+          memory: 1000M
         limits:
-          memory: 2000M
+          memory: 1500M
     extra_hosts:
       - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
     secrets:
@@ -44,9 +44,9 @@ services:
         constraints: [node.role == manager]
       resources:
         reservations:
-          memory: 1000M
+          memory: 500M
         limits:
-          memory: 1500M
+          memory: 1000M
 
 secrets:
   jenkins-user:
