@@ -24,9 +24,9 @@ services:
         constraints: [node.role == manager]
       resources:
         reservations:
-          memory: 1000M
+          memory: 500M
         limits:
-          memory: 1500M
+          memory: 1000M
 
   docs:
     image: vfarcic/docker-flow-hub-docs:${TAG:-latest}
