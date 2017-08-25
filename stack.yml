@@ -5,8 +5,9 @@ services:
   jenkins-master:
     image: vfarcic/jenkins:${JENKINS_MASTER_TAG:-latest}
     ports:
-      - 8090:8080
       - 50000:50000
+    networks:
+      - proxy
     volumes:
       - jm:/var/jenkins_home
       - jmshare:/usr/share/jenkins/ref
@@ -25,6 +26,8 @@ services:
           memory: 2000M
         limits:
           memory: 2500M
+      placement:
+        constraints: [node.role == worker]
     extra_hosts:
       - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
     secrets:
@@ -37,6 +40,8 @@ services:
       - USER_NAME_SECRET=/run/secrets/${JENKINS_USER_SECRET:-jenkins-user}
       - PASSWORD_SECRET=/run/secrets/${JENKINS_PASS_SECRET:-jenkins-pass}
       - COMMAND_OPTIONS=-master http://jenkins-master:8080 -labels "prod" -executors 2
+    networks:
+      - default
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
@@ -93,7 +98,7 @@ services:
 #      - LOGSPOUT=ignore
 #
 #  kibana:
-#    image: kibana:5.1.2
+#    image: docker.elastic.co/kibana/kibana:5.5.2
 #    networks:
 #      - default
 #      - proxy
