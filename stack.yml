@@ -2,12 +2,41 @@ version: "3.1"
 
 services:
 
+  jenkins-master:
+    image: vfarcic/jenkins:${JENKINS_MASTER_TAG:-latest}
+    ports:
+      - 8090:8080
+      - 50000:50000
+    volumes:
+      - jm:/var/jenkins_home
+      - jmshare:/usr/share/jenkins/ref
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.serviceDomain=jenkins.dockerflow.com
+        - com.df.port=8080
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 2000M
+        limits:
+          memory: 2500M
+    extra_hosts:
+      - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
+    secrets:
+      - jenkins-user
+      - jenkins-pass
+
   jenkins-agent:
     image: vfarcic/jenkins-swarm-agent
     environment:
       - USER_NAME_SECRET=/run/secrets/${JENKINS_USER_SECRET:-jenkins-user}
       - PASSWORD_SECRET=/run/secrets/${JENKINS_PASS_SECRET:-jenkins-pass}
-      - COMMAND_OPTIONS=-master http://jenkins.dockerflow.com:8090 -labels "prod" -executors 2
+      - COMMAND_OPTIONS=-master http://jenkins-master:8080 -labels "prod" -executors 2
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
@@ -49,12 +78,67 @@ services:
         limits:
           memory: 10M
 
+#  elasticsearch:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
+#    environment:
+#      - xpack.security.enabled=false
+#    networks:
+#      - default
+#
+#  logstash:
+#    image: vfarcic/logstash:5.5.2
+#    networks:
+#      - default
+#    environment:
+#      - LOGSPOUT=ignore
+#
+#  kibana:
+#    image: kibana:5.1.2
+#    networks:
+#      - default
+#      - proxy
+#    ports:
+#      - 5601:5601 # Remove
+#    environment:
+#      - xpack.security.enabled=false
+#      - ELASTICSEARCH_URL=http://elasticsearch:9200
+#    deploy:
+#      labels:
+#        - com.df.notify=true
+#        - com.df.distribute=true
+#        - com.df.usersPassEncrypted=false
+#        - com.df.usersSecret=vfarcic
+#        - com.df.serviceDomain=kibana.dockerflow.com
+#        - com.df.port=5601
+#
+#  logspout:
+#    image: gliderlabs/logspout:v3.2.2
+#    networks:
+#      - default
+#    environment:
+#      - SYSLOG_FORMAT=rfc3164
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    command: syslog://logstash:51415
+#    deploy:
+#      mode: global
+
 networks:
   proxy:
     external: true
+  default:
+    external: false
 
 secrets:
   jenkins-user:
     external: true
   jenkins-pass:
     external: true
+
+volumes:
+  jm:
+    driver: cloudstor:aws
+    external: false
+  jmshare:
+    driver: cloudstor:aws
+    external: false
