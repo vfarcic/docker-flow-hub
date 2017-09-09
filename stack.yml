@@ -8,6 +8,7 @@ services:
       - 50000:50000
     networks:
       - proxy
+      - default
     volumes:
       - jm:/var/jenkins_home
       - jmshare:/usr/share/jenkins/ref
@@ -21,13 +22,12 @@ services:
         - com.df.alertName=memlimit
         - com.df.alertIf=@service_mem_limit:0.8
         - com.df.alertFor=30s
+        - com.df.httpsOnly=true
       resources:
         reservations:
           memory: 2000M
         limits:
           memory: 2500M
-      placement:
-        constraints: [node.role == worker]
     extra_hosts:
       - "${SLACK_HOST:-devops20.slack.com}:${SLACK_IP:-54.192.78.227}"
     secrets:
@@ -83,50 +83,97 @@ services:
         limits:
           memory: 10M
 
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
-#    environment:
-#      - xpack.security.enabled=false
-#    networks:
-#      - default
-#
-#  logstash:
-#    image: vfarcic/logstash:5.5.2
-#    networks:
-#      - default
-#    environment:
-#      - LOGSPOUT=ignore
-#
-#  kibana:
-#    image: docker.elastic.co/kibana/kibana:5.5.2
-#    networks:
-#      - default
-#      - proxy
-#    ports:
-#      - 5601:5601 # Remove
-#    environment:
-#      - xpack.security.enabled=false
-#      - ELASTICSEARCH_URL=http://elasticsearch:9200
-#    deploy:
-#      labels:
-#        - com.df.notify=true
-#        - com.df.distribute=true
-#        - com.df.usersPassEncrypted=false
-#        - com.df.usersSecret=vfarcic
-#        - com.df.serviceDomain=kibana.dockerflow.com
-#        - com.df.port=5601
-#
-#  logspout:
-#    image: gliderlabs/logspout:v3.2.2
-#    networks:
-#      - default
-#    environment:
-#      - SYSLOG_FORMAT=rfc3164
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
+    environment:
+      - xpack.security.enabled=false
 #    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    command: syslog://logstash:51415
-#    deploy:
-#      mode: global
+#      - es:/usr/share/elasticsearch/data
+    networks:
+      - default
+    deploy:
+      labels:
+        - com.df.distribute=true
+        - com.df.notify=true
+        - com.df.port=80
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 3000M
+        limits:
+          memory: 3500M
+      placement:
+        constraints: [node.role == worker]
+
+  logstash:
+    image: vfarcic/logstash:5.5.2
+    networks:
+      - default
+    deploy:
+      labels:
+        - com.df.distribute=true
+        - com.df.notify=true
+        - com.df.port=80
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 600M
+        limits:
+          memory: 1000M
+    environment:
+      - LOGSPOUT=ignore
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.5.2
+    networks:
+      - default
+      - proxy
+    environment:
+      - xpack.security.enabled=false
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.usersPassEncrypted=false
+        - com.df.usersSecret=vfarcic
+        - com.df.serviceDomain=kibana.dockerflow.com
+        - com.df.port=5601
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 150M
+        limits:
+          memory: 300M
+
+  logspout:
+    image: gliderlabs/logspout:v3.2.2
+    networks:
+      - default
+    environment:
+      - SYSLOG_FORMAT=rfc3164
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: syslog://logstash:51415
+    deploy:
+      mode: global
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 20M
+        limits:
+          memory: 30M
 
 networks:
   proxy:
