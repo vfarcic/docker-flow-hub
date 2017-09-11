@@ -14,7 +14,7 @@ It consists of the following projects:
 
 **[Docker Flow Let's Encrypt (by hamburml)](https://github.com/hamburml/docker-flow-letsencrypt)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
 
-**[Docker Flow Let's Encrypt (by nib0r)](https://github.com/n1b0r/docker-flow-proxy-letsencrypt)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
+**[Docker Flow Let's Encrypt (by nib0r)](http://letsencrypt.dockerflow.com/)**: periodically creates certificates and sends them to *Docker Flow Proxy*.
 
 ---
 

@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.3"
 
 services:
 
@@ -61,6 +61,27 @@ services:
           memory: 500M
         limits:
           memory: 1000M
+
+  nib0r-dfle-docs:
+    image: nib0r/docker-flow-proxy-letsencrypt-docs:${NIB0R_DFLE_DOCS_TAG:-latest}
+    networks:
+      - proxy
+    deploy:
+      labels:
+        - com.df.distribute=true
+        - com.df.notify=true
+        - com.df.port=80
+        - com.df.serviceDomain=nib0r-letsencrypt.dockerflow.com
+        - com.df.servicePath=/
+        - com.df.alertName=memlimit
+        - com.df.alertIf=@service_mem_limit:0.8
+        - com.df.alertFor=30s
+      replicas: 2
+      resources:
+        reservations:
+          memory: 5M
+        limits:
+          memory: 10M
 
   docs:
     image: vfarcic/docker-flow-hub-docs:${TAG:-latest}
@@ -148,9 +169,9 @@ services:
         - com.df.alertFor=30s
       resources:
         reservations:
-          memory: 150M
+          memory: 500M
         limits:
-          memory: 300M
+          memory: 1000M
 
   logspout:
     image: gliderlabs/logspout:v3.2.2
