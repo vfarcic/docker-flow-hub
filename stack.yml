@@ -47,6 +47,7 @@ services:
     secrets:
       - jenkins-user
       - jenkins-pass
+      - aws
     deploy:
       labels:
         - com.df.notify=true
@@ -71,7 +72,7 @@ services:
         - com.df.distribute=true
         - com.df.notify=true
         - com.df.port=80
-        - com.df.serviceDomain=nib0r-letsencrypt.dockerflow.com
+        - com.df.serviceDomain=proxy-letsencrypt.dockerflow.com
         - com.df.servicePath=/
         - com.df.alertName=memlimit
         - com.df.alertIf=@service_mem_limit:0.8
@@ -108,6 +109,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     environment:
       - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
 #    volumes:
 #      - es:/usr/share/elasticsearch/data
     networks:
@@ -122,9 +124,9 @@ services:
         - com.df.alertFor=30s
       resources:
         reservations:
-          memory: 3000M
+          memory: 3400M
         limits:
-          memory: 3500M
+          memory: 3800M
       placement:
         constraints: [node.role == worker]
 
@@ -206,6 +208,8 @@ secrets:
   jenkins-user:
     external: true
   jenkins-pass:
+    external: true
+  aws:
     external: true
 
 volumes:
