@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  docs:
+    image: thomasjpfan/docker-scaler-docs:latest
+    networks:
+      - proxy
+    deploy:
+      labels:
+        - com.df.distribute=true
+        - com.df.notify=true
+        - com.df.reschedule=true
+        - com.df.port=80
+        - com.df.serviceDomain=scaler.dockerflow.com
+        - com.df.servicePath=/
+      replicas: 2
+      resources:
+        reservations:
+          memory: 5m
+        limits:
+          memory: 10m
+
+networks:
+  proxy:
+    external: true
+
