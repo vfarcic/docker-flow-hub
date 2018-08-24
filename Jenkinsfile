@@ -44,7 +44,7 @@ pipeline {
         label "prod"
       }
       steps {
-        sh "docker service update --image vfarcic/docker-flow-hub-docs:${currentBuild.displayName} infra_docs"
+        sh "helm upgrade -i docker-flow-hub helm/docker-flow-hub --namespace df --set image.tag=${currentBuild.displayName}"
       }
     }
   }
