@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: ui
-        image: dockerflow/docker-flow-hub-docs:{{ .Values.image.tag }}
+        image: vfarcic/docker-flow-hub-docs:{{ .Values.image.tag }}
         readinessProbe:
           httpGet:
             path: /
