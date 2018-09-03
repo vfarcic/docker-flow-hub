@@ -1,6 +1,6 @@
 ```bash
 helm upgrade -i docker-flow-hub \
-    helm/devops-toolkit \
+    helm/docker-flow-hub \
     --namespace df
 
 kubectl -n df \
