@@ -1,0 +1,28 @@
+---
+# Source: docker-flow-hub/templates/ing.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hub-docker-flow-hub
+  labels:
+    app: docker-flow-hub
+    chart: docker-flow-hub-0.0.1
+    release: hub
+    heritage: Tiller
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/issuer: "letsencrypt-prod"
+    certmanager.k8s.io/acme-challenge-type: http01
+spec:
+  rules:
+  - host: www.dockerflow.com
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: hub-docker-flow-hub
+            servicePort: 80
+  tls:
+  - hosts:
+    - www.dockerflow.com
+    secretName: letsencrypt-secret-hub
